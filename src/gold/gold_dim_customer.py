@@ -2,18 +2,36 @@
 
 from pyspark.sql import functions as F
 from pyspark.sql.window import Window
+from pyspark.sql import SparkSession
+
+spark = SparkSession.getActiveSession()
+if spark is None:
+    from databricks.connect import DatabricksSession
+
+    spark = DatabricksSession.builder.getOrCreate()
 
 # 1. Read Silver tables
-crm = spark.table("workspace.silver.crm_cust_info")
-erp = spark.table("workspace.silver.erp_cust_az12")
-loc = spark.table("workspace.silver.erp_loc_a101")
+crm = spark.table("workspace.silver.crm_customer")
+erp = spark.table("workspace.silver.erp_customer_demographics")
+loc = spark.table("workspace.silver.erp_customer_location")
 
 # Inspect rows that cannot be included in the customer dimension
 invalid_customers = crm.filter(F.col("customer_id").isNull())
-display(invalid_customers)
+invalid_customers.show(10, truncate=False)
 
 # Only include customers with a valid ID
 crm = crm.filter(F.col("customer_id").isNotNull())
+
+# Keep the most recently created CRM record when an ID occurs more than once.
+latest_customer = Window.partitionBy("customer_id").orderBy(
+    F.col("customer_create_date").desc_nulls_last(),
+    F.col("customer_key").desc_nulls_last(),
+)
+crm = (
+    crm.withColumn("_customer_row", F.row_number().over(latest_customer))
+    .filter(F.col("_customer_row") == 1)
+    .drop("_customer_row")
+)
 
 # 2. Join customer data
 df = (
@@ -104,11 +122,4 @@ if has_duplicate_ids > 0:
     .mode("overwrite")
     .option("overwriteSchema", "true")
     .saveAsTable("workspace.gold.dim_customers")
-)
-
-# 7. Preview
-display(
-    spark.table("workspace.gold.dim_customers")
-    .orderBy("customer_key")
-    .limit(10)
 )
