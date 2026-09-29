@@ -117,12 +117,15 @@ df = df.filter(
     & (F.col("sales_amount") > 0)
 )
 
-# 9. Write to Silver
+#9. Rename table
+table_name = "workspace.silver.crm_sales"
+
+# 10. Write to Silver
 
 (
     df.write
     .format("delta")
     .mode("overwrite")
     .option("overwriteSchema", "true")
-    .saveAsTable("workspace.silver.crm_sales_details")
+    .saveAsTable(table_name)
 )

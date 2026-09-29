@@ -71,11 +71,19 @@ invalid_customers = df.join(
 )
 
 # 8. Write to Silver
-
+table_name = "workspace.silver.erp_customer_demographics"
 (
     df.write
     .format("delta")
     .mode("overwrite")
     .option("overwriteSchema", "true")
-    .saveAsTable("workspace.silver.erp_cust_az12")
+    .saveAsTable(table_name)
+)
+
+# 9. Write to Bronze
+table_name = "workspace.bronze.erp_cust_az12_invalid"
+(
+    invalid_customers.write
+    .format("delta")
+    .mode()
 )

@@ -45,11 +45,11 @@ df = df.withColumn(
 df = df.dropDuplicates()
 
 # 6. Write to Silver
-
+table_name = "workspace.silver.erp_product_category"
 (
     df.write
     .format("delta")
     .mode("overwrite")
     .option("overwriteSchema", "true")
-    .saveAsTable("workspace.silver.erp_px_cat_g1v2")
+    .saveAsTable(table_name)
 )

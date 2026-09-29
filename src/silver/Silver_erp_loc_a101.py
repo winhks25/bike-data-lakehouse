@@ -65,16 +65,11 @@ invalid_customers = df.join(
 print("Invalid customer references:", invalid_customers.count())
 
 # 7. Write to Silver
-
+table_name = "workspace.silver.erp_customer_location"
 (
     df.write
     .format("delta")
     .mode("overwrite")
     .option("overwriteSchema", "true")
-    .saveAsTable("workspace.silver.erp_loc_a101")
+    .saveAsTable(table_name)
 )
-
-
-# Check result
-
-df.display()
