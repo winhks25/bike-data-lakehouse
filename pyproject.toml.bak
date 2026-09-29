@@ -1,0 +1,10 @@
+[project]
+name = "bike-data-lakehouse"
+version = "0.0.0"
+
+[dependency-groups]
+dev = []
+
+[tool.databricks.environment]
+environment_version = "5"
+
