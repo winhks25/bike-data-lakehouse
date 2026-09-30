@@ -86,13 +86,13 @@ df = df.dropDuplicates()
 # 7. Foreign key validation
 
 customer_df = (
-    spark.table("workspace.silver.crm_cust_info")
+    spark.table("workspace.silver.crm_customer")
     .select("customer_id")
     .distinct()
 )
 
 product_df = (
-    spark.table("workspace.silver.crm_prd_info")
+    spark.table("workspace.silver.crm_product")
     .select("product_key")
     .distinct()
 )

@@ -51,7 +51,7 @@ df = df.dropDuplicates()
 # 6. Foreign key validation
 
 customer_df = (
-    spark.table("workspace.silver.crm_cust_info")
+    spark.table("workspace.silver.crm_customer")
     .select("customer_id")
     .distinct()
 )
