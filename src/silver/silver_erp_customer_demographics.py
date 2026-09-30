@@ -59,7 +59,7 @@ df = df.dropDuplicates()
 # 7. Foreign key validation
 
 customer_df = (
-    spark.table("workspace.silver.crm_cust_info")
+    spark.table("workspace.silver.crm_customer")
     .select("customer_id")
     .distinct()
 )
@@ -80,10 +80,12 @@ table_name = "workspace.silver.erp_customer_demographics"
     .saveAsTable(table_name)
 )
 
-# 9. Write to Bronze
+# 9. Write invalid references to Bronze for review
 table_name = "workspace.bronze.erp_cust_az12_invalid"
 (
     invalid_customers.write
     .format("delta")
-    .mode()
+    .mode("overwrite")
+    .option("overwriteSchema", "true")
+    .saveAsTable(table_name)
 )
